@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Axle pin 3D viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; }
+  #stage { position: relative; width: 100%; height: 100%; min-height: 240px; }
+  #c { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; outline-offset: -2px; }
+  #c:active { cursor: grabbing; }
+  #c:focus-visible { outline: 2px solid #378add; }
+  .btn {
+    font: 13px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 8px 12px; border-radius: 8px;
+    border: 1px solid rgba(120, 128, 136, 0.5);
+    background: rgba(255, 255, 255, 0.85); color: #222; cursor: pointer;
+  }
+  .btn:focus-visible { outline: 2px solid #378add; }
+  .btn[aria-pressed="true"] { background: #222; color: #fff; border-color: #222; }
+  #reset { position: absolute; right: 10px; bottom: 10px; }
+  #opts { position: absolute; left: 10px; bottom: 10px; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100% - 120px); }
+  #err { display: none; padding: 24px 12px; color: #666; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" tabindex="0" role="img" aria-label="Axle pins (φ1.38×4.2, φ1.39×8, φ1.40×12 mm) 3D model. Drag to rotate; arrow keys also work."></canvas>
+  <div id="err">WebGL is not available in this browser, so the 3D model cannot be displayed.</div>
+  <div id="opts"></div>
+  <button id="reset" class="btn" type="button">Reset view</button>
+</div>
+
+<script>
+(function () {
+  var CFG = {"target": [0, 0, 0], "radius": 7.1, "dist": 29.109999999999996, "home": {"yaw": 0.5, "pitch": 0.45}};
+  var stage = document.getElementById('stage');
+  var cv = document.getElementById('c');
+  var gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, preserveDrawingBuffer: true });
+
+  function fail() {
+    cv.style.display = 'none';
+    document.getElementById('reset').style.display = 'none';
+    document.getElementById('opts').style.display = 'none';
+    document.getElementById('err').style.display = 'block';
+  }
+  if (!gl) { fail(); return; }
+
+  var VS = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}';
+  var FS = [
+    '#ifdef GL_FRAGMENT_PRECISION_HIGH',
+    'precision highp float;',
+    '#else',
+    'precision mediump float;',
+    '#endif',
+    'uniform vec2 uRes;uniform vec2 uRot;uniform float uDist;uniform vec3 uT;uniform float uBR;uniform vec3 uCol;uniform float uVar;'
+  ].join('\n') + "\n#define PINPERP vec3(0.0,0.7071,0.7071)\n#define WC vec2(0.0000,0.0000)\n#define WRAD 1.0000\n#define WBORE 0.7500\n\n\nfloat hash1(float n){return fract(sin(n)*43758.5453);}\nvec3 studio(vec3 r){\n float hz=r.y;\n vec3 st=mix(vec3(0.03,0.035,0.04),vec3(0.28,0.30,0.33),smoothstep(-0.6,-0.05,hz));\n st=mix(st,vec3(0.06,0.065,0.07),smoothstep(-0.05,0.08,hz)*(1.0-smoothstep(0.08,0.3,hz)));\n st=mix(st,vec3(0.85,0.88,0.92),smoothstep(0.25,0.75,hz));\n st+=vec3(2.4)*smoothstep(0.92,0.985,dot(r,normalize(vec3(0.5,0.7,0.6))));\n st+=vec3(1.3,1.35,1.45)*smoothstep(0.9,0.98,dot(r,normalize(vec3(-0.8,0.25,0.4))));\n st+=vec3(0.9)*smoothstep(0.93,0.99,dot(r,normalize(vec3(0.1,0.35,-0.9))));\n return st;}\nvec3 metal(vec3 F0,vec3 rf,vec3 L,float nv,float ao,float br){\n vec3 F=F0+(1.0-F0)*pow(1.0-nv,5.0);\n float sp=pow(max(dot(rf,L),0.0),80.0);\n return studio(rf)*F*br*(0.35+0.65*ao)+F*sp*2.0*ao+F0*0.03;}\nfloat sdBox(vec3 p,vec3 b){vec3 q=abs(p)-b;return length(max(q,0.0))+min(max(q.x,max(q.y,q.z)),0.0);}\nfloat rBox(vec3 p,vec3 b,float r){return sdBox(p,b-vec3(r))-r;}\nfloat cyl(vec2 q,float a,float r,float a0,float a1){\n vec2 d=vec2(length(q)-r,abs(a-(a0+a1)*0.5)-(a1-a0)*0.5);\n return min(max(d.x,d.y),0.0)+length(max(d,0.0));}\nfloat chamf(float d,float rr,float a,float a0,float a1,float r,float c){\n d=max(d,(rr-(a-a0)-(r-c))*0.7071);\n d=max(d,(rr+(a-a1)-(r-c))*0.7071);\n return d;}\nfloat groove(float d,float rr,float a,float g,float w,float rin){\n return max(d,-max(abs(a-g)-w,rin-rr));}\nfloat rBox2(vec2 p,vec2 b,float r){vec2 q=abs(p)-b+r;return min(max(q.x,q.y),0.0)+length(max(q,0.0))-r;}\nfloat extrude(float d2,float z,float h){vec2 w=vec2(d2,abs(z)-h);return min(max(w.x,w.y),0.0)+length(max(w,0.0));}\n// carbide wheel lying in the XY plane, centred at c, axis along Z\nfloat wheelSD(vec3 p,vec3 c,float R,float h,float rb,float deg){\n vec3 q=p-c;float r=length(q.xy);float g=radians(deg*0.5);\n float d=max(r-R,abs(q.z)-h);\n d=max(d,abs(q.z)*cos(g)+(r-R)*sin(g));\n d=max(d,rb-r);\n return d;}\n// ---- satin / cast stainless helpers (materials 8, 9)\nfloat hash3(vec3 p){p=fract(p*0.3183099+0.1);p*=17.0;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}\nfloat vnoise(vec3 x){vec3 i=floor(x);vec3 f=fract(x);f=f*f*(3.0-2.0*f);\n return mix(mix(mix(hash3(i),hash3(i+vec3(1,0,0)),f.x),mix(hash3(i+vec3(0,1,0)),hash3(i+vec3(1,1,0)),f.x),f.y),\n            mix(mix(hash3(i+vec3(0,0,1)),hash3(i+vec3(1,0,1)),f.x),mix(hash3(i+vec3(0,1,1)),hash3(i+vec3(1,1,1)),f.x),f.y),f.z);}\nfloat smax(float a,float b,float k){float h=clamp(0.5-0.5*(b-a)/k,0.0,1.0);return mix(b,a,h)+k*h*(1.0-h);}\nfloat smin(float a,float b,float k){float h=clamp(0.5+0.5*(b-a)/k,0.0,1.0);return mix(b,a,h)-k*h*(1.0-h);}\n// studio environment pre-blurred by a lobe sharpness k (small k = rough)\nvec3 envR(vec3 d,float k){\n float u=d.y*0.5+0.5;\n float w=clamp(6.0/k,0.0,1.0);\n vec3 c=mix(vec3(0.07,0.075,0.085),vec3(0.80,0.83,0.88),smoothstep(0.30-0.25*w,0.95+0.05*w,u));\n c=mix(c,vec3(0.32,0.33,0.35),(1.0-smoothstep(0.0,0.12+0.3*w,abs(d.y)))*0.55);\n c+=vec3(2.2)*k/12.0*exp(k*(dot(d,normalize(vec3(0.5,0.7,0.6)))-1.0))*(0.6+0.4*w);\n c+=vec3(1.15,1.2,1.3)*k/12.0*exp(k*(dot(d,normalize(vec3(-0.8,0.25,0.4)))-1.0))*(0.6+0.4*w);\n c+=vec3(0.9)*k/12.0*exp(k*(dot(d,normalize(vec3(0.1,0.35,-0.9)))-1.0))*(0.6+0.4*w);\n return c;}\n// ---- smooth polished metal, shared by every metal part\n#define SMF0 vec3(0.66,0.675,0.695)\nfloat strip(vec3 d,vec2 dir,float w){vec2 h=d.xz;float l=length(h);if(l<1e-4)return 0.0;\n return smoothstep(1.0-w,1.0-w*0.35,dot(h/l,normalize(dir)))*smoothstep(-0.25,0.05,d.y)*(1.0-smoothstep(0.55,0.85,d.y));}\nvec3 envS(vec3 d){\n vec3 c=mix(vec3(0.16,0.165,0.175),vec3(0.58,0.60,0.63),smoothstep(-0.35,0.02,d.y));\n c=mix(c,vec3(1.0,1.02,1.05),smoothstep(0.25,0.75,d.y));\n c+=vec3(1.9)*strip(d,vec2(0.8,0.6),0.05);\n c+=vec3(1.3,1.35,1.42)*strip(d,vec2(-0.9,0.35),0.035);\n c+=vec3(0.9)*strip(d,vec2(0.15,-1.0),0.04);\n c+=vec3(2.4)*smoothstep(0.94,0.985,dot(d,normalize(vec3(0.5,0.7,0.6))));\n return c;}\nvec3 smoothMetal(vec3 n,vec3 rd,float ao,vec3 F0){\n vec3 rf=reflect(rd,n);\n float nv=max(dot(n,-rd),0.0);\n vec3 F=F0+(1.0-F0)*pow(1.0-nv,5.0);\n vec3 c=envS(rf)*F;\n c+=F*2.5*pow(max(dot(rf,normalize(vec3(0.5,0.8,0.6))),0.0),300.0);\n return c*(0.25+0.75*ao);}\n\n// pin along X: flat end at -L/2, conical chamfer (TIP mm long, down to radius TIPR) at +L/2\n#define TIP 0.4\n#define TIPR 0.0\nfloat pinX(vec3 p,float z,float L,float r){\n vec3 q=p-vec3(0.0,0.0,z);float rr=length(q.yz);\n float d=cyl(q.yz,q.x,r,-L*0.5,L*0.5);\n float k=(r-TIPR)/TIP;\n d=max(d,(rr-r+k*(q.x-(L*0.5-TIP)))/sqrt(1.0+k*k));\n d=max(d,(rr-(q.x+L*0.5)-(r-0.03))*0.7071);\n return d;}\nvec2 map(vec3 p){\n float d=pinX(p,-3.2,4.2,0.69);\n d=min(d,pinX(p,0.0,8.0,0.695));\n d=min(d,pinX(p,3.2,12.0,0.70));\n return vec2(d,2.0);}\n" + [
+    'vec3 calcNormal(vec3 p){vec2 e=vec2(1.0,-1.0)*0.0006*uBR;',
+    ' return normalize(e.xyy*map(p+e.xyy).x+e.yyx*map(p+e.yyx).x+e.yxy*map(p+e.yxy).x+e.xxx*map(p+e.xxx).x);}',
+    'float calcAO(vec3 p,vec3 n){float occ=0.0;float sca=1.0;',
+    ' for(int i=0;i<5;i++){float h=(0.004+0.025*float(i)/4.0)*uBR;float d=map(p+n*h).x;occ+=(h-d)*sca;sca*=0.8;}',
+    ' return clamp(1.0-1.8*occ/(0.12*uBR),0.0,1.0);}',
+    'vec3 env(vec3 d){',
+    ' float u=d.y*0.5+0.5;',
+    ' vec3 c=mix(vec3(0.10,0.11,0.13),vec3(0.78,0.82,0.88),smoothstep(0.15,0.95,u));',
+    ' float s1=smoothstep(0.86,0.97,dot(d,normalize(vec3(0.5,0.7,0.6))));',
+    ' float s2=smoothstep(0.88,0.98,dot(d,normalize(vec3(-0.8,0.25,0.4))));',
+    ' float s3=smoothstep(0.9,0.99,dot(d,normalize(vec3(0.1,0.3,-0.9))));',
+    ' c+=vec3(1.6)*s1+vec3(0.9,0.95,1.1)*s2+vec3(0.7)*s3;',
+    ' return c;}',
+    'void main(){',
+    ' vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;',
+    ' vec3 T=uT;',
+    ' float cp=cos(uRot.y),sp=sin(uRot.y);',
+    ' vec3 ro=T+uDist*vec3(cp*sin(uRot.x),sp,cp*cos(uRot.x));',
+    ' vec3 fw=normalize(T-ro);',
+    ' vec3 rt=normalize(cross(fw,vec3(0.0,1.0,0.0)));',
+    ' vec3 up=cross(rt,fw);',
+    ' vec3 rd=normalize(fw+(uv.x*rt+uv.y*up)*2.0*0.27);',
+    ' vec3 oc=ro-T;float b=dot(oc,rd);float c=dot(oc,oc)-uBR*uBR;float h=b*b-c;',
+    ' if(h<0.0){gl_FragColor=vec4(0.0);return;}',
+    ' float sq=sqrt(h);float t=max(-b-sq,0.0);float t1=-b+sq;',
+    ' float eps=0.00012*uDist;',
+    ' float minR=1e9;float tNear=t;bool hit=false;vec2 m=vec2(0.0);',
+    ' for(int i=0;i<200;i++){',
+    '  vec3 p=ro+rd*t;m=map(p);',
+    '  if(m.x<eps){hit=true;break;}',
+    '  float rr=m.x/t;if(rr<minR){minR=rr;tNear=t;}',
+    '  t+=m.x*0.9;if(t>t1)break;}',
+    ' float a=1.0;',
+    ' if(!hit){',
+    '  float pxw=2.0*0.27/uRes.y;',
+    '  a=1.0-smoothstep(0.0,pxw,minR);',
+    '  if(a<0.01){gl_FragColor=vec4(0.0);return;}',
+    '  t=tNear;m=map(ro+rd*t);}',
+    ' vec3 p=ro+rd*t;',
+    ' vec3 n=calcNormal(p);',
+    ' float ao=calcAO(p,n);',
+    ' vec3 L=normalize(vec3(0.5,0.8,0.6));',
+    ' float diff=max(dot(n,L),0.0);',
+    ' vec3 rf=reflect(rd,n);',
+    ' vec3 e=env(rf)*ao;',
+    ' float nv=max(dot(n,-rd),0.0);',
+    ' float fr=pow(1.0-nv,4.0);',
+    ' float id=m.y;vec3 col;',
+    ' if(id>4.5&&id<5.5){',
+    // injection-moulded plastic: translucent body, micro texture, glossy sheen
+    '  vec3 alb=uCol;',
+    '  vec3 pn=vec3(sin(p.y*23.0+sin(p.z*17.0)),sin(p.z*21.0+sin(p.x*19.0)),sin(p.x*25.0+sin(p.y*15.0)));',
+    '  vec3 nn=normalize(n+0.03*pn);',
+    '  float wrap=max((dot(nn,L)+0.5)/1.5,0.0);',
+    '  float fill=max(dot(nn,normalize(vec3(-0.7,0.2,0.5))),0.0);',
+    '  float th=clamp(-map(p-n*0.7).x/0.7,0.0,1.0);',
+    '  float bl=pow(clamp(dot(rd,L)*0.5+0.5,0.0,1.0),2.0);',
+    '  vec3 trans=alb*alb*(1.0-th)*(0.45+0.35*bl);',
+    '  float nvv=max(dot(nn,-rd),0.0);',
+    '  float sp=pow(max(dot(reflect(rd,nn),L),0.0),40.0)*0.5+pow(max(dot(reflect(rd,nn),normalize(vec3(-0.8,0.25,0.4))),0.0),30.0)*0.2;',
+    '  col=alb*(0.16+0.72*wrap+0.18*fill)*ao+trans*ao+sp*ao+studio(reflect(rd,nn))*(0.03+0.3*pow(1.0-nvv,5.0))*ao;',
+    " }else if(id>7.5){",
+    "  col=smoothMetal(n,rd,ao,SMF0);",
+    ' }else if(id>6.5&&id<7.5){',
+    // white engineering plastic insert
+    '  vec3 alb=vec3(0.86,0.86,0.82);',
+    '  float wrap=max((dot(n,L)+0.4)/1.4,0.0);',
+    '  col=alb*(0.25+0.75*wrap)*ao+0.04*e;',
+    ' }else{',
+    '  vec3 alb;float refl;',
+    '  if(id<1.5){',            // stainless holder (brushed)
+    '   col=smoothMetal(n,rd,ao,SMF0);col=1.0-exp(-col*1.35);col=pow(col,vec3(1.0/2.2));gl_FragColor=vec4(col*a,a);return;',
+    '  }else if(id<2.5){',      // polished pin
+    '   col=smoothMetal(n,rd,ao,SMF0);',
+    '   col=1.0-exp(-col*1.35);col=pow(col,vec3(1.0/2.2));gl_FragColor=vec4(col*a,a);return;',
+    '  }else if(id<4.5){',      // tungsten carbide (3) / coated carbide (4)
+    '   float rr=length(p.xy-WC);',
+    '   bool face=abs(n.z)>0.93;',
+    '   vec3 F0=SMF0;',
+    '   if(id>3.5&&!face&&rr>WBORE){',
+    '    float ph=1.9*nv+0.45*rr/WRAD+0.08*p.z;',
+    '    vec3 film=0.5+0.5*cos(6.2832*(ph+vec3(0.0,0.33,0.67)));',
+    '    F0=mix(vec3(0.30,0.27,0.62),film*0.75,0.5)*(face?1.0:1.15);',
+    '   }',
+    '   col=smoothMetal(n,rd,ao,F0);',
+    '   col=1.0-exp(-col*1.35);col=pow(col,vec3(1.0/2.2));gl_FragColor=vec4(col*a,a);return;',
+    '  }else{',                 // black oxide steel
+    '   alb=vec3(0.10,0.105,0.115);refl=0.42;',
+    '  }',
+    '  col=alb*(0.14+0.3*diff)*ao+alb*e*refl+fr*0.12*e;',
+    ' }',
+    ' col=1.0-exp(-col*1.35);',
+    ' col=pow(col,vec3(1.0/2.2));',
+    ' gl_FragColor=vec4(col*a,a);}'
+  ].join('\n');
+
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fail(); return; }
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, 'a');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  var U = {};
+  ['uRes', 'uRot', 'uDist', 'uT', 'uBR', 'uCol', 'uVar'].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
+
+  var W = 0, Hh = 0;
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var w = Math.max(200, stage.clientWidth || 360);
+    var h = Math.max(200, stage.clientHeight || 360);
+    W = Math.round(w * dpr); Hh = Math.round(h * dpr);
+    cv.width = W; cv.height = Hh;
+    gl.viewport(0, 0, W, Hh);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
+
+  // optional variant buttons (e.g. clip colours)
+  var col = CFG.color || [0.7, 0.7, 0.7];
+  var qs = new URLSearchParams(location.search);
+  if (CFG.options) {
+    var box = document.getElementById('opts');
+    var btns = [];
+    var pick = function (i) {
+      col = CFG.options[i].color;
+      btns.forEach(function (b, j) { b.setAttribute('aria-pressed', i === j ? 'true' : 'false'); });
+    };
+    CFG.options.forEach(function (o, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn'; b.textContent = o.label;
+      b.addEventListener('click', function () { pick(i); });
+      box.appendChild(b); btns.push(b);
+    });
+    var init = 0;
+    var want = (qs.get(CFG.optionParam || 'opt') || '').toLowerCase();
+    CFG.options.forEach(function (o, i) { if (o.key === want) init = i; });
+    pick(init);
+  }
+
+  var HOME = CFG.home;
+  var AUTO_SPIN = 0.006;
+  var yaw = HOME.yaw, pitch = HOME.pitch;
+  var dragging = false, px = 0, py = 0;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var auto = !reduceMotion && !qs.has('still');
+
+  function clampPitch() { pitch = Math.max(-1.3, Math.min(1.3, pitch)); }
+
+  cv.addEventListener('pointerdown', function (e) {
+    dragging = true; auto = false;
+    px = e.clientX; py = e.clientY;
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    yaw -= (e.clientX - px) * 0.012;
+    pitch += (e.clientY - py) * 0.012;
+    clampPitch();
+    px = e.clientX; py = e.clientY;
+  });
+  cv.addEventListener('pointerup', function () { dragging = false; });
+  cv.addEventListener('pointercancel', function () { dragging = false; });
+
+  cv.addEventListener('keydown', function (e) {
+    var step = 0.12, used = true;
+    if (e.key === 'ArrowLeft') yaw += step;
+    else if (e.key === 'ArrowRight') yaw -= step;
+    else if (e.key === 'ArrowUp') pitch += step;
+    else if (e.key === 'ArrowDown') pitch -= step;
+    else used = false;
+    if (used) { auto = false; clampPitch(); e.preventDefault(); }
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    yaw = HOME.yaw; pitch = HOME.pitch; auto = !reduceMotion;
+  });
+
+  // ?yaw=&pitch= for fixed product shots
+  if (qs.has('yaw')) yaw = parseFloat(qs.get('yaw'));
+  if (qs.has('pitch')) pitch = parseFloat(qs.get('pitch'));
+
+  function loop() {
+    if (auto && !dragging) yaw += AUTO_SPIN;
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform2f(U.uRes, W, Hh);
+    gl.uniform2f(U.uRot, yaw, pitch);
+    gl.uniform1f(U.uDist, CFG.dist);
+    gl.uniform3f(U.uT, CFG.target[0], CFG.target[1], CFG.target[2]);
+    gl.uniform1f(U.uBR, CFG.radius);
+    gl.uniform3f(U.uCol, col[0], col[1], col[2]);
+    gl.uniform1f(U.uVar, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+</body>
+</html>

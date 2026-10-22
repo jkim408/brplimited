@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cutting wheel holder 3D viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; }
+  #stage { position: relative; width: 100%; height: 100%; min-height: 240px; }
+  #c { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; outline-offset: -2px; }
+  #c:active { cursor: grabbing; }
+  #c:focus-visible { outline: 2px solid #378add; }
+  #reset {
+    position: absolute; right: 10px; bottom: 10px;
+    font: 13px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 8px 12px; border-radius: 8px;
+    border: 1px solid rgba(120, 128, 136, 0.5);
+    background: rgba(255, 255, 255, 0.85); color: #222; cursor: pointer;
+  }
+  #reset:focus-visible { outline: 2px solid #378add; }
+  #err {
+    display: none; padding: 24px 12px; color: #666;
+    font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" tabindex="0" role="img" aria-label="Cutting wheel holder and pin 3D model. Drag to rotate; arrow keys also work."></canvas>
+  <div id="err">WebGL is not available in this browser, so the 3D model cannot be displayed.</div>
+  <button id="reset" type="button">Reset view</button>
+</div>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var cv = document.getElementById('c');
+  var gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false });
+
+  function fail() {
+    cv.style.display = 'none';
+    document.getElementById('reset').style.display = 'none';
+    document.getElementById('err').style.display = 'block';
+  }
+  if (!gl) { fail(); return; }
+
+  var VS = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}';
+
+  var FS = [
+    '#ifdef GL_FRAGMENT_PRECISION_HIGH',
+    'precision highp float;',
+    '#else',
+    'precision mediump float;',
+    '#endif',
+    'uniform vec2 uRes;uniform vec2 uRot;uniform float uDist;',
+
+    'const float H=5.4;',
+    'const float R=2.3;',
+    'const float SW=0.55;',
+    'const float SF=-0.2;',
+    'const float AXY=4.1;',
+    'const float PY=-1.5;',
+    'const float YC=2.0;',
+    'const float YT=2.9615;',
+
+    'float bodySD(vec3 p){',
+    ' float r=length(p.xz);',
+    ' float d=max(r-R,abs(p.y)-H);',
+    ' float ba=1.0,bb=1.3;',
+    ' d=max(d,(abs(p.z)*bb+p.y*ba-(R*bb+H*ba-ba*bb))/1.6401);',
+    ' d=max(d,(r-p.y-(R+H-0.2))*0.7071);',
+    ' float cyl=max(r-1.6,abs(p.y+2.2)-4.2);',
+    ' float cone=max((r-(YT-p.y)*1.664)*0.515,YC-p.y);',
+    ' d=max(d,-min(cyl,cone));',
+    ' d=max(d,-((r+p.y+H-1.8)*0.7071));',
+    ' d=max(d,-max(abs(p.x)-SW,SF-p.y));',
+    ' float hA=(length(vec2(p.y-AXY,p.z))-0.45-max(abs(p.x)-2.05,0.0))*0.7;',
+    ' d=max(d,-hA);',
+    ' float hP=(length(vec2(p.x,p.y-PY))-0.66-max(abs(p.z)-2.08,0.0))*0.7;',
+    ' d=max(d,-hP);',
+    ' return d;}',
+
+    'float pinSD(vec3 p){',
+    ' vec3 q=p-vec3(0.0,PY,0.0);',
+    ' float r=length(q.xy);',
+    ' float d=max(r-0.65,abs(q.z-2.75)-4.65);',
+    ' d=max(d,(r+(q.z-7.4)-0.32)*0.7071);',
+    ' d=max(d,(r-(q.z+1.9)-0.5)*0.7071);',
+    ' return d;}',
+
+    'vec2 map(vec3 p){float a=bodySD(p);float b=pinSD(p);return a<b?vec2(a,1.0):vec2(b,2.0);}',
+
+    'vec3 calcNormal(vec3 p){vec2 e=vec2(1.0,-1.0)*0.0008;',
+    ' return normalize(e.xyy*map(p+e.xyy).x+e.yyx*map(p+e.yyx).x+e.yxy*map(p+e.yxy).x+e.xxx*map(p+e.xxx).x);}',
+
+    'float calcAO(vec3 p,vec3 n){float occ=0.0;float sca=1.0;',
+    ' for(int i=0;i<5;i++){float h=0.03+0.18*float(i)/4.0;float d=map(p+n*h).x;occ+=(h-d)*sca;sca*=0.8;}',
+    ' return clamp(1.0-1.8*occ,0.0,1.0);}',
+
+    'vec3 env(vec3 d){',
+    ' float u=d.y*0.5+0.5;',
+    ' vec3 c=mix(vec3(0.10,0.11,0.13),vec3(0.78,0.82,0.88),smoothstep(0.15,0.95,u));',
+    ' float s1=smoothstep(0.86,0.97,dot(d,normalize(vec3(0.5,0.7,0.6))));',
+    ' float s2=smoothstep(0.88,0.98,dot(d,normalize(vec3(-0.8,0.25,0.4))));',
+    ' float s3=smoothstep(0.9,0.99,dot(d,normalize(vec3(0.1,0.3,-0.9))));',
+    ' c+=vec3(1.6)*s1+vec3(0.9,0.95,1.1)*s2+vec3(0.7)*s3;',
+    ' return c;}',
+
+    '#define SMF0 vec3(0.66,0.675,0.695)',
+    "float strip(vec3 d,vec2 dir,float w){vec2 h=d.xz;float l=length(h);if(l<1e-4)return 0.0;",
+    " return smoothstep(1.0-w,1.0-w*0.35,dot(h/l,normalize(dir)))*smoothstep(-0.25,0.05,d.y)*(1.0-smoothstep(0.55,0.85,d.y));}",
+    "vec3 envS(vec3 d){",
+    " vec3 c=mix(vec3(0.16,0.165,0.175),vec3(0.58,0.60,0.63),smoothstep(-0.35,0.02,d.y));",
+    " c=mix(c,vec3(1.0,1.02,1.05),smoothstep(0.25,0.75,d.y));",
+    " c+=vec3(1.9)*strip(d,vec2(0.8,0.6),0.05);",
+    " c+=vec3(1.3,1.35,1.42)*strip(d,vec2(-0.9,0.35),0.035);",
+    " c+=vec3(0.9)*strip(d,vec2(0.15,-1.0),0.04);",
+    " c+=vec3(2.4)*smoothstep(0.94,0.985,dot(d,normalize(vec3(0.5,0.7,0.6))));",
+    " return c;}",
+    "vec3 smoothMetal(vec3 n,vec3 rd,float ao,vec3 F0){",
+    " vec3 rf=reflect(rd,n);",
+    " float nv=max(dot(n,-rd),0.0);",
+    " vec3 F=F0+(1.0-F0)*pow(1.0-nv,5.0);",
+    " vec3 c=envS(rf)*F;",
+    " c+=F*2.5*pow(max(dot(rf,normalize(vec3(0.5,0.8,0.6))),0.0),300.0);",
+    " return c*(0.25+0.75*ao);}",
+    'void main(){',
+    ' vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;',
+    ' vec3 T=vec3(0.0,0.0,1.5);',
+    ' float cp=cos(uRot.y),sp=sin(uRot.y);',
+    ' vec3 ro=T+uDist*vec3(cp*sin(uRot.x),sp,cp*cos(uRot.x));',
+    ' vec3 fw=normalize(T-ro);',
+    ' vec3 rt=normalize(cross(fw,vec3(0.0,1.0,0.0)));',
+    ' vec3 up=cross(rt,fw);',
+    ' vec3 rd=normalize(fw+(uv.x*rt+uv.y*up)*2.0*0.27);',
+    ' vec3 oc=ro-T;float b=dot(oc,rd);float c=dot(oc,oc)-52.0;float h=b*b-c;',
+    ' if(h<0.0){gl_FragColor=vec4(0.0);return;}',
+    ' float sq=sqrt(h);float t=-b-sq;float t1=-b+sq;',
+    ' float minR=1e9;float tNear=t;bool hit=false;vec2 m=vec2(0.0);',
+    ' for(int i=0;i<160;i++){',
+    '  vec3 p=ro+rd*t;m=map(p);',
+    '  if(m.x<0.0008){hit=true;break;}',
+    '  float rr=m.x/t;if(rr<minR){minR=rr;tNear=t;}',
+    '  t+=m.x;if(t>t1)break;}',
+    ' float a=1.0;',
+    ' if(!hit){',
+    '  float pxw=2.0*0.27/uRes.y;',
+    '  a=1.0-smoothstep(0.0,pxw,minR);',
+    '  if(a<0.01){gl_FragColor=vec4(0.0);return;}',
+    '  t=tNear;m=map(ro+rd*t);}',
+    ' vec3 p=ro+rd*t;',
+    ' vec3 n=calcNormal(p);',
+    ' float ao=calcAO(p,n);',
+    ' vec3 alb;float refl;',
+    ' if(m.y>1.5){',
+    '  vec3 q=p-vec3(0.0,PY,0.0);',
+    '  float hel=sin(q.z*14.0+atan(q.y,q.x)*3.0);',
+    '  alb=vec3(0.72,0.75,0.78)*(0.93+0.07*hel);refl=0.72;',
+    ' }else{',
+    '  float br=sin(atan(p.z,p.x)*140.0+p.y*3.0)*0.5+0.5;',
+    '  alb=vec3(0.66,0.69,0.72)*(0.96+0.04*br);refl=0.8;',
+    '  if(p.y>H-0.03&&n.y>0.95){alb=vec3(0.34,0.36,0.38);refl=0.38;}',
+    ' }',
+    ' vec3 L=normalize(vec3(0.5,0.8,0.6));',
+    ' float diff=max(dot(n,L),0.0);',
+    ' vec3 rf=reflect(rd,n);',
+    ' vec3 e=env(rf)*ao;',
+    ' float fr=pow(1.0-max(dot(n,-rd),0.0),4.0);',
+    ' vec3 col=smoothMetal(n,rd,ao,SMF0);',
+    ' col=1.0-exp(-col*1.35);',
+    ' col=pow(col,vec3(1.0/2.2));',
+    ' gl_FragColor=vec4(col*a,a);}'
+  ].join('\n');
+
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fail(); return; }
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, 'a');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  var uRes = gl.getUniformLocation(prog, 'uRes');
+  var uRot = gl.getUniformLocation(prog, 'uRot');
+  var uDist = gl.getUniformLocation(prog, 'uDist');
+
+  var W = 0, Hh = 0;
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var w = Math.max(200, stage.clientWidth || 360);
+    var h = Math.max(200, stage.clientHeight || 360);
+    W = Math.round(w * dpr); Hh = Math.round(h * dpr);
+    cv.width = W; cv.height = Hh;
+    gl.viewport(0, 0, W, Hh);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
+
+  var HOME = { yaw: 1.35, pitch: 0.25 };
+  var AUTO_SPIN = 0.006;
+  var yaw = HOME.yaw, pitch = HOME.pitch;
+  var dragging = false, px = 0, py = 0;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var auto = !reduceMotion;
+
+  function clampPitch() { pitch = Math.max(-1.3, Math.min(1.3, pitch)); }
+
+  cv.addEventListener('pointerdown', function (e) {
+    dragging = true; auto = false;
+    px = e.clientX; py = e.clientY;
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    yaw -= (e.clientX - px) * 0.012;
+    pitch += (e.clientY - py) * 0.012;
+    clampPitch();
+    px = e.clientX; py = e.clientY;
+  });
+  cv.addEventListener('pointerup', function () { dragging = false; });
+  cv.addEventListener('pointercancel', function () { dragging = false; });
+
+  cv.addEventListener('keydown', function (e) {
+    var step = 0.12, used = true;
+    if (e.key === 'ArrowLeft') yaw += step;
+    else if (e.key === 'ArrowRight') yaw -= step;
+    else if (e.key === 'ArrowUp') pitch += step;
+    else if (e.key === 'ArrowDown') pitch -= step;
+    else used = false;
+    if (used) { auto = false; clampPitch(); e.preventDefault(); }
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    yaw = HOME.yaw; pitch = HOME.pitch; auto = !reduceMotion;
+  });
+
+  function loop() {
+    if (auto && !dragging) yaw += AUTO_SPIN;
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform2f(uRes, W, Hh);
+    gl.uniform2f(uRot, yaw, pitch);
+    gl.uniform1f(uDist, 30.0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+</body>
+</html>
