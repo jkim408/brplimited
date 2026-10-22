@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core drill 3D viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; }
+  body.thumb { background: #fff; }
+  #stage { position: relative; width: 100%; height: 100%; min-height: 240px; }
+  #c { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  #c:active { cursor: grabbing; }
+  #c:focus-visible { outline: 2px solid #5980a6; outline-offset: -2px; }
+  .btn { font: 13px/1 system-ui, sans-serif; padding: 8px 12px; border: 1px solid rgba(120,128,136,.5); background: rgba(255,255,255,.85); color: #222; cursor: pointer; }
+  #reset { position: absolute; right: 10px; bottom: 10px; }
+  body.thumb #reset { display: none; }
+  #err { display: none; padding: 24px 12px; color: #666; font: 14px/1.5 system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" tabindex="0" role="img" aria-label="Core drill 3D model. Drag or use the arrow keys to rotate."></canvas>
+  <div id="err">3D view is not available in this browser.</div>
+  <button id="reset" class="btn" type="button">Reset view</button>
+</div>
+<script>
+(function () {
+  var CFG = {"target":[0.05,0,0],"radius":2.6,"dist":7.4,"home":{"yaw":0.55,"pitch":0.32}};
+  var qs = new URLSearchParams(location.search);
+  if (qs.has('thumb')) document.body.className = 'thumb';
+  var stage = document.getElementById('stage'), cv = document.getElementById('c');
+  var gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, preserveDrawingBuffer: true });
+  function fail() { cv.style.display = 'none'; document.getElementById('reset').style.display = 'none'; document.getElementById('err').style.display = 'block'; }
+  if (!gl) { fail(); return; }
+  var VS = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}';
+  var FS = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform vec2 uRes;uniform vec2 uRot;uniform float uDist;uniform vec3 uT;uniform float uBR;
+const vec3 L=vec3(0.4851,0.7276,0.4851);
+float hash1(float n){return fract(sin(n)*43758.5453);}
+float hash3(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
+vec3 studio(vec3 r){
+ float hz=r.y;
+ vec3 st=mix(vec3(0.05,0.055,0.06),vec3(0.30,0.32,0.35),smoothstep(-0.6,-0.05,hz));
+ st=mix(st,vec3(0.08,0.085,0.09),smoothstep(-0.05,0.08,hz)*(1.0-smoothstep(0.08,0.3,hz)));
+ st=mix(st,vec3(0.86,0.89,0.93),smoothstep(0.25,0.75,hz));
+ st+=vec3(2.4)*smoothstep(0.92,0.985,dot(r,normalize(vec3(0.5,0.7,0.6))));
+ st+=vec3(1.3,1.35,1.45)*smoothstep(0.9,0.98,dot(r,normalize(vec3(-0.8,0.25,0.4))));
+ st+=vec3(0.9)*smoothstep(0.93,0.99,dot(r,normalize(vec3(0.1,0.35,-0.9))));
+ return st;}
+vec3 metal(vec3 n,vec3 rd,float ao,vec3 F0,float rough){
+ vec3 rf=reflect(rd,n);
+ vec3 e=mix(studio(rf),studio(normalize(n+rf))*0.9,rough);
+ float nv=max(dot(n,-rd),0.0);
+ vec3 F=F0+(1.0-F0)*pow(1.0-nv,5.0);
+ float sp=pow(max(dot(rf,L),0.0),mix(90.0,25.0,rough));
+ return e*F*(0.35+0.65*ao)+F*sp*1.4*ao+F0*0.04;}
+float capY(vec3 p,float r,float y0,float y1){vec2 d=vec2(length(p.xz)-r,abs(p.y-(y0+y1)*0.5)-(y1-y0)*0.5);return min(max(d.x,d.y),0.0)+length(max(d,0.0));}
+float capX(vec3 p,float r,float x0,float x1){vec2 d=vec2(length(p.yz)-r,abs(p.x-(x0+x1)*0.5)-(x1-x0)*0.5);return min(max(d.x,d.y),0.0)+length(max(d,0.0));}
+@@MAP@@
+vec3 calcNormal(vec3 p){vec2 e=vec2(1.0,-1.0)*0.0005*uBR;
+ return normalize(e.xyy*map(p+e.xyy).x+e.yyx*map(p+e.yyx).x+e.yxy*map(p+e.yxy).x+e.xxx*map(p+e.xxx).x);}
+float calcAO(vec3 p,vec3 n){float occ=0.0;float sca=1.0;
+ for(int i=0;i<5;i++){float h=(0.004+0.03*float(i)/4.0)*uBR;float d=map(p+n*h).x;occ+=(h-d)*sca;sca*=0.8;}
+ return clamp(1.0-1.6*occ/(0.12*uBR),0.0,1.0);}
+void main(){
+ vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;
+ float cp=cos(uRot.y),sp=sin(uRot.y);
+ vec3 ro=uT+uDist*vec3(cp*sin(uRot.x),sp,cp*cos(uRot.x));
+ vec3 fw=normalize(uT-ro);vec3 rt=normalize(cross(fw,vec3(0.0,1.0,0.0)));vec3 up=cross(rt,fw);
+ vec3 rd=normalize(fw+(uv.x*rt+uv.y*up)*0.54);
+ vec3 oc=ro-uT;float b=dot(oc,rd);float c=dot(oc,oc)-uBR*uBR;float h=b*b-c;
+ if(h<0.0){gl_FragColor=vec4(0.0);return;}
+ float sq=sqrt(h);float t=max(-b-sq,0.0);float t1=-b+sq;
+ float eps=0.0001*uDist;float minR=1e9;float tNear=t;bool hit=false;vec2 m=vec2(0.0);
+ for(int i=0;i<220;i++){vec3 p=ro+rd*t;m=map(p);if(m.x<eps){hit=true;break;}
+  float rr=m.x/t;if(rr<minR){minR=rr;tNear=t;}t+=m.x*0.85;if(t>t1)break;}
+ float a=1.0;
+ if(!hit){float pxw=0.54/uRes.y;a=1.0-smoothstep(0.0,pxw,minR);if(a<0.01){gl_FragColor=vec4(0.0);return;}t=tNear;m=map(ro+rd*t);}
+ vec3 p=ro+rd*t;vec3 n=calcNormal(p);float ao=calcAO(p,n);
+ vec3 col;
+@@SHADE@@
+ col=1.0-exp(-col*1.35);col=pow(col,vec3(1.0/2.2));
+ gl_FragColor=vec4(col*a,a);}`;
+  FS = FS.replace('@@MAP@@', "vec2 map(vec3 p){\n float rr=length(p.yz);float x=p.x;\n float thr=0.56-0.06*abs(fract(x*11.0)*2.0-1.0);\n float d=capX(p,0.56,-2.3,-1.62);\n d=max(d,(rr-thr)*0.6);\n d=max(d,(rr-(x+2.3)-0.5)*0.7071);\n d=min(d,capX(p,0.47,-1.7,-1.5));\n float body=capX(p,0.78,-1.55,-0.38);\n body=max(body,(rr+(x+0.38)-0.78+0.14)*0.7071);\n body=max(body,(rr-(x+1.55)-0.78+0.04)*0.7071);\n body=max(body,-max(0.6-abs(p.z),-1.22-x));\n d=min(d,body);\n d=min(d,capX(p,0.47,-0.42,0.32));\n float s2=capX(p,0.37,0.28,0.95);s2=max(s2,(rr+(x-0.95)-0.37+0.04)*0.7071);d=min(d,s2);\n float s3=capX(p,0.30,0.9,1.28);s3=max(s3,(rr+(x-1.28)-0.30+0.1)*0.7071);d=min(d,s3);\n d=min(d,capX(p,0.17,1.2,2.06));\n float tip=capX(p,0.188,2.02,2.42);\n tip=max(tip,-(capX(p,0.115,2.1,2.6)));\n tip=max(tip,-max(abs(p.y)-0.025,2.3-x));\n d=max(d,-(capX(p,0.115,2.1,2.6)));\n if(tip<d)return vec2(tip,2.0);\n return vec2(d,1.0);}").replace('@@SHADE@@', " if(m.y>1.5){\n  vec3 alb=vec3(0.33,0.31,0.27);\n  vec3 c3=floor(p*260.0);float g=hash3(c3);\n  vec3 nn=normalize(n+0.3*(vec3(hash3(c3+1.3),hash3(c3+2.1),hash3(c3+3.7))-0.5));\n  float wrap=max((dot(nn,L)+0.4)/1.4,0.0);\n  col=alb*(0.12+0.7*wrap)*ao*(0.7+0.6*g);\n  col+=vec3(1.4)*pow(max(dot(reflect(rd,nn),L),0.0),40.0)*step(0.88,g)*ao;\n }else{\n  vec3 nn=n;\n  if(abs(n.x)<0.5){nn=normalize(n+vec3(0.01*(hash1(floor(p.x*500.0))-0.5),0.0,0.0));}\n  col=metal(nn,rd,ao,vec3(0.62,0.63,0.66),0.3);\n }");
+  function compile(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s)); return s; }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fail(); return; }
+  gl.useProgram(prog);
+  var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  var U = {}; ['uRes', 'uRot', 'uDist', 'uT', 'uBR'].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
+  var W = 0, Hh = 0, queued = false;
+  function draw() {
+    queued = false;
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform2f(U.uRes, W, Hh); gl.uniform2f(U.uRot, yaw, pitch); gl.uniform1f(U.uDist, CFG.dist);
+    gl.uniform3f(U.uT, CFG.target[0], CFG.target[1], CFG.target[2]); gl.uniform1f(U.uBR, CFG.radius);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  function req() { if (!queued) { queued = true; requestAnimationFrame(draw); } }
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(200, stage.clientWidth || 360), h = Math.max(200, stage.clientHeight || 360);
+    W = Math.round(w * dpr); Hh = Math.round(h * dpr); cv.width = W; cv.height = Hh; gl.viewport(0, 0, W, Hh); req();
+  }
+  var HOME = CFG.home, yaw = HOME.yaw, pitch = HOME.pitch, dragging = false, px = 0, py = 0;
+  function clampPitch() { pitch = Math.max(-1.3, Math.min(1.3, pitch)); }
+  cv.addEventListener('pointerdown', function (e) { dragging = true; px = e.clientX; py = e.clientY; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', function (e) { if (!dragging) return; yaw -= (e.clientX - px) * 0.012; pitch += (e.clientY - py) * 0.012; clampPitch(); px = e.clientX; py = e.clientY; req(); });
+  cv.addEventListener('pointerup', function () { dragging = false; });
+  cv.addEventListener('pointercancel', function () { dragging = false; });
+  cv.addEventListener('keydown', function (e) {
+    var s = 0.12, used = true;
+    if (e.key === 'ArrowLeft') yaw += s; else if (e.key === 'ArrowRight') yaw -= s;
+    else if (e.key === 'ArrowUp') pitch += s; else if (e.key === 'ArrowDown') pitch -= s; else used = false;
+    if (used) { clampPitch(); e.preventDefault(); req(); }
+  });
+  document.getElementById('reset').addEventListener('click', function () { yaw = HOME.yaw; pitch = HOME.pitch; req(); });
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
+  resize();
+})();
+</script>
+</body>
+</html>
