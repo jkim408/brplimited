@@ -25,15 +25,15 @@
 </head>
 <body>
 <div id="stage">
-  <canvas id="c" tabindex="0" role="img" aria-label="White plastic clip (135°) with N2 cutting wheel, 3D model. Drag to rotate; arrow keys also work."></canvas>
-  <div id="err">WebGL is not available in this browser, so the 3D model cannot be displayed.</div>
+  <canvas id="c" tabindex="0" role="img" aria-label="Plastic clip White 135° with N2 cutting wheel, 3D model. Drag or use the arrow keys to rotate."></canvas>
+  <div id="err">3D view is not available in this browser.</div>
   <div id="opts"></div>
   <button id="reset" class="btn" type="button">Reset view</button>
 </div>
 
 <script>
 (function () {
-  var CFG = {"target": [0, 6.7, 0], "radius": 9.8, "dist": 40.18, "home": {"yaw": 0.55, "pitch": 0.25}, "optionParam": "color", "options": [{"key": "white", "label": "135° White", "color": [0.86, 0.87, 0.86]}, {"key": "black", "label": "145° Black", "color": [0.045, 0.045, 0.05]}, {"key": "red", "label": "155° Red", "color": [0.86, 0.09, 0.03]}]};
+  var CFG = {"target": [0, 6.7, 0], "radius": 9.8, "dist": 40.18, "home": {"yaw": 0.55, "pitch": 0.25}, "color": [0.86,0.87,0.86]};
   var stage = document.getElementById('stage');
   var cv = document.getElementById('c');
   var gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, preserveDrawingBuffer: true });
@@ -205,7 +205,7 @@
       box.appendChild(b); btns.push(b);
     });
     var init = 0;
-    var want = (qs.get(CFG.optionParam || 'opt') || 'white').toLowerCase();
+    var want = (qs.get(CFG.optionParam || 'opt') || '').toLowerCase();
     CFG.options.forEach(function (o, i) { if (o.key === want) init = i; });
     pick(init);
   }
