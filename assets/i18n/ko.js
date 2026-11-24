@@ -297,7 +297,7 @@ window.BRP_I18N.ko = {
  "Development of tungsten carbide glass cutting wheels and other tools begins.": "텅스텐 카바이드 유리 커팅 휠과 기타 공구 개발 시작.",
  "Carbide cutting tool production starts at the Anyang-City factory.": "안양 공장에서 초경 절삭 공구 생산 시작.",
  "Automatic machine for fine grinding of cutting wheels completed.": "커팅 휠 정밀 연삭 자동화 설비 완성.",
- "Export supply of glass cutting wheels begins, starting with float glass plants in Turkey.": "튀르키예 플로트 유리 공장을 시작으로 유리 커팅 휠 수출 공급 시작.",
+ "Began exporting glass cutting wheels to float glass plants in Turkiye and was registered as an official supplier to Şişecam.": "튀르키예 플로트 유리 공장에 유리 커팅 휠 수출을 시작했으며, Şişecam의 공식 공급업체로 등록되었습니다.",
  "Supply expands to glass plants in Russia and Europe.": "러시아와 유럽의 유리 공장으로 공급 확대.",
  "Plastic clips developed and first exported.": "플라스틱 클립 개발 및 첫 수출.",
  "Grinding automation upgraded for productivity and quality stability; special wheels supplied to plants across Europe, the Middle East and South America.": "생산성과 품질 안정성을 위해 연삭 자동화 고도화, 유럽·중동·남미 공장에 특수 휠 공급.",

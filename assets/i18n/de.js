@@ -297,7 +297,7 @@ window.BRP_I18N.de = {
  "Development of tungsten carbide glass cutting wheels and other tools begins.": "Beginn der Entwicklung von Glasschneidrädern aus Wolframkarbid und weiteren Werkzeugen.",
  "Carbide cutting tool production starts at the Anyang-City factory.": "Start der Hartmetall-Werkzeugfertigung im Werk Anyang.",
  "Automatic machine for fine grinding of cutting wheels completed.": "Automatikmaschine für den Feinschliff von Schneidrädern fertiggestellt.",
- "Export supply of glass cutting wheels begins, starting with float glass plants in Turkey.": "Beginn der Exportlieferung von Glasschneidrädern, zuerst an Floatglaswerke in der Türkei.",
+ "Began exporting glass cutting wheels to float glass plants in Turkiye and was registered as an official supplier to Şişecam.": "Beginn der Exporte von Glasschneidrädern an Floatglaswerke in der Türkei und Registrierung als offizieller Lieferant von Şişecam.",
  "Supply expands to glass plants in Russia and Europe.": "Ausweitung der Lieferungen auf Glaswerke in Russland und Europa.",
  "Plastic clips developed and first exported.": "Kunststoffclips entwickelt und erstmals exportiert.",
  "Grinding automation upgraded for productivity and quality stability; special wheels supplied to plants across Europe, the Middle East and South America.": "Schleifautomatisierung für Produktivität und Qualitätsstabilität ausgebaut; Spezialräder an Werke in Europa, im Nahen Osten und in Südamerika geliefert.",
