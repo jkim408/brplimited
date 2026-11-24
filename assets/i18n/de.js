@@ -225,6 +225,7 @@ window.BRP_I18N.de = {
  "In use by a major buyer for over 9 years": "Seit über 9 Jahren bei einem Großkunden im Einsatz",
  "Replaces normal types A – D": "Ersetzt die Normaltypen A – D",
  "The improved type pillar post is more efficient than the normal types.": "Der Pillar Post im verbesserten Typ ist effizienter als die Normaltypen.",
+ "The Improved Type Pillar Post allows lines that use plastic clips to switch to a metal wheel holder and cutting wheel assembly. This helps extend cutting wheel life and reduce operating costs.": "Mit dem verbesserten Pillar Post können Anlagen mit Kunststoffclips auf eine Kombination aus Metall-Radhalter und Schneidrad umgerüstet werden. Das trägt dazu bei, die Standzeit des Schneidrads zu verlängern und die Betriebskosten zu senken.",
  "It has been in continuous use by a major buyer for over 9 years, and replaces every normal type (A, B, C, D).": "Er ist seit über 9 Jahren bei einem Großkunden im Dauereinsatz und ersetzt jeden Normaltyp (A, B, C, D).",
  "Normal type A · B · C · D": "Normaltyp A · B · C · D",
  "4 variations: A, B, C, D": "4 Varianten: A, B, C, D",

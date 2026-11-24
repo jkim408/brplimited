@@ -225,6 +225,7 @@ window.BRP_I18N.ko = {
  "In use by a major buyer for over 9 years": "주요 고객사에서 9년 이상 사용 중",
  "Replaces normal types A – D": "일반형 A~D 대체 가능",
  "The improved type pillar post is more efficient than the normal types.": "개선형 필라포스트는 일반형보다 효율적입니다.",
+ "The Improved Type Pillar Post allows lines that use plastic clips to switch to a metal wheel holder and cutting wheel assembly. This helps extend cutting wheel life and reduce operating costs.": "개선형 필라포스트는 플라스틱 클립을 사용하는 라인에서도 메탈 휠 홀더와 커팅 휠 조합으로 교체해 사용할 수 있도록 설계했습니다. 이를 통해 커팅 휠 수명을 늘리고 운영 비용을 줄일 수 있습니다.",
  "It has been in continuous use by a major buyer for over 9 years, and replaces every normal type (A, B, C, D).": "주요 고객사에서 9년 이상 꾸준히 사용 중이며, 모든 일반형(A, B, C, D)을 대체할 수 있습니다.",
  "Normal type A · B · C · D": "일반형 A · B · C · D",
  "4 variations: A, B, C, D": "4종: A, B, C, D",

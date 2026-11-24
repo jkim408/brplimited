@@ -225,6 +225,7 @@ window.BRP_I18N.tr = {
  "In use by a major buyer for over 9 years": "Büyük bir alıcı tarafından 9 yılı aşkın süredir kullanılıyor",
  "Replaces normal types A – D": "Normal A – D tiplerinin yerini alır",
  "The improved type pillar post is more efficient than the normal types.": "Geliştirilmiş tip pillar post, normal tiplerden daha verimlidir.",
+ "The Improved Type Pillar Post allows lines that use plastic clips to switch to a metal wheel holder and cutting wheel assembly. This helps extend cutting wheel life and reduce operating costs.": "Geliştirilmiş Pillar Post, plastik klips kullanılan hatların metal tekerlek tutucu ve kesme tekerleği kombinasyonuna geçmesini sağlar. Bu sayede kesme tekerleğinin ömrü uzatılabilir ve işletme maliyetleri azaltılabilir.",
  "It has been in continuous use by a major buyer for over 9 years, and replaces every normal type (A, B, C, D).": "Büyük bir alıcı tarafından 9 yılı aşkın süredir kesintisiz kullanılmaktadır ve tüm normal tiplerin (A, B, C, D) yerini alır.",
  "Normal type A · B · C · D": "Normal tip A · B · C · D",
  "4 variations: A, B, C, D": "4 çeşit: A, B, C, D",
