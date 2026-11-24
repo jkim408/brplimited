@@ -315,6 +315,7 @@ window.BRP_I18N.ko = {
  "glass cutting heads": "유리 커팅 헤드",
  "lower than new": "새 제품보다 저렴",
  "metal": "금속",
+ "Metal": "금속",
  "original condition": "원래 상태",
  "pattern, mirror, solar, hard glass": "패턴, 거울, 태양광, 경질 유리",
  "Pattern, Mirror, Solar, Hard glass": "패턴, 거울, 태양광, 경질 유리",

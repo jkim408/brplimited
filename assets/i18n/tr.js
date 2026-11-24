@@ -315,6 +315,7 @@ window.BRP_I18N.tr = {
  "glass cutting heads": "cam kesme kafaları",
  "lower than new": "yeniden daha düşük",
  "metal": "metal",
+ "Metal": "metal",
  "original condition": "orijinal durum",
  "pattern, mirror, solar, hard glass": "desenli, ayna, solar, sert cam",
  "Pattern, Mirror, Solar, Hard glass": "desenli, ayna, solar, sert cam",

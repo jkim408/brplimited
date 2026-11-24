@@ -315,6 +315,7 @@ window.BRP_I18N.de = {
  "glass cutting heads": "Glasschneidköpfe",
  "lower than new": "günstiger als neu",
  "metal": "Metall",
+ "Metal": "Metall",
  "original condition": "Originalzustand",
  "pattern, mirror, solar, hard glass": "Ornament-, Spiegel-, Solar-, Hartglas",
  "Pattern, Mirror, Solar, Hard glass": "Ornament-, Spiegel-, Solar-, Hartglas",
