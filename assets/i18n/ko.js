@@ -298,7 +298,7 @@ window.BRP_I18N.ko = {
  "Carbide cutting tool production starts at the Anyang-City factory.": "안양 공장에서 초경 절삭 공구 생산 시작.",
  "Automatic machine for fine grinding of cutting wheels completed.": "커팅 휠 정밀 연삭 자동화 설비 완성.",
  "Began exporting glass cutting wheels to float glass plants in Turkiye and was registered as an official supplier to Şişecam.": "튀르키예 플로트 유리 공장에 유리 커팅 휠 수출을 시작했으며, Şişecam의 공식 공급업체로 등록되었습니다.",
- "Supply expands to glass plants in Russia and Europe.": "러시아와 유럽의 유리 공장으로 공급 확대.",
+ "Expanded supply to glass plants in Russia and Europe. Began supplying a Guardian Glass plant in Russia and was registered as an official supplier to Guardian Glass.": "러시아와 유럽의 유리 공장으로 공급을 확대했습니다. Guardian Glass의 러시아 공장에 공급을 시작하고 공식 공급업체로 등록되었습니다.",
  "Plastic clips developed and first exported.": "플라스틱 클립 개발 및 첫 수출.",
  "Grinding automation upgraded for productivity and quality stability; special wheels supplied to plants across Europe, the Middle East and South America.": "생산성과 품질 안정성을 위해 연삭 자동화 고도화, 유럽·중동·남미 공장에 특수 휠 공급.",
  "120° – 165°, 1° steps": "120° – 165°, 1° 단위",

@@ -298,7 +298,7 @@ window.BRP_I18N.de = {
  "Carbide cutting tool production starts at the Anyang-City factory.": "Start der Hartmetall-Werkzeugfertigung im Werk Anyang.",
  "Automatic machine for fine grinding of cutting wheels completed.": "Automatikmaschine für den Feinschliff von Schneidrädern fertiggestellt.",
  "Began exporting glass cutting wheels to float glass plants in Turkiye and was registered as an official supplier to Şişecam.": "Beginn der Exporte von Glasschneidrädern an Floatglaswerke in der Türkei und Registrierung als offizieller Lieferant von Şişecam.",
- "Supply expands to glass plants in Russia and Europe.": "Ausweitung der Lieferungen auf Glaswerke in Russland und Europa.",
+ "Expanded supply to glass plants in Russia and Europe. Began supplying a Guardian Glass plant in Russia and was registered as an official supplier to Guardian Glass.": "Die Belieferung wurde auf Glaswerke in Russland und Europa ausgeweitet. BRP begann mit der Belieferung eines russischen Werks von Guardian Glass und wurde als offizieller Lieferant registriert.",
  "Plastic clips developed and first exported.": "Kunststoffclips entwickelt und erstmals exportiert.",
  "Grinding automation upgraded for productivity and quality stability; special wheels supplied to plants across Europe, the Middle East and South America.": "Schleifautomatisierung für Produktivität und Qualitätsstabilität ausgebaut; Spezialräder an Werke in Europa, im Nahen Osten und in Südamerika geliefert.",
  "120° – 165°, 1° steps": "120° – 165°, 1°-Schritte",

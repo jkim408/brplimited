@@ -298,7 +298,7 @@ window.BRP_I18N.tr = {
  "Carbide cutting tool production starts at the Anyang-City factory.": "Anyang fabrikasında karbür kesici takım üretimi başladı.",
  "Automatic machine for fine grinding of cutting wheels completed.": "Kesme tekerleklerinin hassas taşlaması için otomatik makine tamamlandı.",
  "Began exporting glass cutting wheels to float glass plants in Turkiye and was registered as an official supplier to Şişecam.": "Türkiye’deki float cam fabrikalarına cam kesme tekerleği ihracatı başladı ve Şişecam’ın resmî tedarikçisi olarak kaydolundu.",
- "Supply expands to glass plants in Russia and Europe.": "Tedarik Rusya ve Avrupa'daki cam fabrikalarına genişledi.",
+ "Expanded supply to glass plants in Russia and Europe. Began supplying a Guardian Glass plant in Russia and was registered as an official supplier to Guardian Glass.": "Tedarik Rusya ve Avrupa’daki cam fabrikalarına genişledi. BRP, Guardian Glass’ın Rusya’daki bir fabrikasına ürün tedarik etmeye başladı ve resmî tedarikçi olarak kaydedildi.",
  "Plastic clips developed and first exported.": "Plastik klipsler geliştirildi ve ilk kez ihraç edildi.",
  "Grinding automation upgraded for productivity and quality stability; special wheels supplied to plants across Europe, the Middle East and South America.": "Verimlilik ve kalite istikrarı için taşlama otomasyonu geliştirildi; Avrupa, Orta Doğu ve Güney Amerika'daki fabrikalara özel tekerlekler tedarik edildi.",
  "120° – 165°, 1° steps": "120° – 165°, 1°'lik adımlar",
