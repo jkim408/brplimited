@@ -1,17 +1,17 @@
-/* brp homepage — language layer (EN source, KO / TR / DE translations)
+/* brp homepage — language layer (EN source, TR / KO translations)
  *
  * The page itself is written in English. This script watches the rendered page and swaps
  * English text for the selected language, using the dictionaries in assets/i18n/<code>.js.
- * It hooks into the site's own language menu (EN · KO · TR · DE): whatever code the menu
+ * It hooks into the site's own language menu (EN · TR · KO): whatever code the menu
  * shows is applied. The choice is remembered (localStorage) and can be forced with ?lang=tr.
  *
- * To add or fix a translation, edit assets/i18n/ko.js, tr.js or de.js:
+ * To add or fix a translation, edit assets/i18n/tr.js or ko.js:
  * the key is the exact English text on the page, the value is the translation.
  */
 (function () {
   'use strict';
-  var CODES = ['EN', 'KO', 'TR', 'DE'];
-  var HTML_LANG = { EN: 'en', KO: 'ko', TR: 'tr', DE: 'de' };
+  var CODES = ['EN', 'TR', 'KO'];
+  var HTML_LANG = { EN: 'en', TR: 'tr', KO: 'ko' };
   var STORE = 'brp-lang';
   var ATTRS = ['aria-label', 'alt', 'title', 'placeholder'];
   var base = (function () {
@@ -41,13 +41,11 @@
   // ---------- string translation
   var COUNT = {
     KO: function (n) { return '제품 ' + n + '개'; },
-    TR: function (n) { return n + ' ürün'; },
-    DE: function (n) { return n + (n === 1 ? ' Produkt' : ' Produkte'); }
+    TR: function (n) { return n + ' ürün'; }
   };
   var BACK = {
     KO: function (x) { return '← ' + x; },
-    TR: function (x) { return '← ' + x; },
-    DE: function (x) { return 'Zurück zu ' + x; }
+    TR: function (x) { return '← ' + x; }
   };
   function tr(s) {
     if (!dict) return null;
