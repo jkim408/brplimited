@@ -356,5 +356,7 @@ window.BRP_I18N.tr = {
  "ST type metal wheel holder. Holds the cutting wheel and carbide axle on the cutting head.": "ST tipi metal tekerlek tutucu. Kesme tekerleğini ve karbür aksı kesme kafasında tutar.",
  "White plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 135°.": "N2 kesme tekerlekli (φ5.6 × 1.08 × 1.42 mm) Beyaz plastik klips, 135°.",
  "Black plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 145°.": "N2 kesme tekerlekli (φ5.6 × 1.08 × 1.42 mm) Siyah plastik klips, 145°.",
- "Red plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 155°.": "N2 kesme tekerlekli (φ5.6 × 1.08 × 1.42 mm) Kırmızı plastik klips, 155°."
+ "Red plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 155°.": "N2 kesme tekerlekli (φ5.6 × 1.08 × 1.42 mm) Kırmızı plastik klips, 155°.",
+ "Developed and ground in-house": "Kendi geliştirmemiz, kendi taşlamamız",
+ "BRP began developing tungsten carbide cutting wheels in 2009 and has made them at its Anyang factory since 2010. The wheels are finished on BRP's own automatic grinding machine, built in 2014 and upgraded since.": "BRP, tungsten karbür kesme tekerleklerini 2009'da geliştirmeye başladı ve 2010'dan beri Anyang fabrikasında üretiyor. Tekerlekler, 2014'te yapılan ve o zamandan beri geliştirilen BRP'nin kendi otomatik taşlama makinesinde son işlemden geçirilir."
 };

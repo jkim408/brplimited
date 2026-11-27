@@ -356,5 +356,7 @@ window.BRP_I18N.ko = {
  "ST type metal wheel holder. Holds the cutting wheel and carbide axle on the cutting head.": "ST 타입 메탈 휠 홀더. 커팅 헤드에 커팅 휠과 초경 액슬을 고정합니다.",
  "White plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 135°.": "N2 커팅 휠(φ5.6 × 1.08 × 1.42 mm)이 장착된 흰색 플라스틱 클립, 135°.",
  "Black plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 145°.": "N2 커팅 휠(φ5.6 × 1.08 × 1.42 mm)이 장착된 검은색 플라스틱 클립, 145°.",
- "Red plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 155°.": "N2 커팅 휠(φ5.6 × 1.08 × 1.42 mm)이 장착된 빨간색 플라스틱 클립, 155°."
+ "Red plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 155°.": "N2 커팅 휠(φ5.6 × 1.08 × 1.42 mm)이 장착된 빨간색 플라스틱 클립, 155°.",
+ "Developed and ground in-house": "자체 개발, 자체 연삭",
+ "BRP began developing tungsten carbide cutting wheels in 2009 and has made them at its Anyang factory since 2010. The wheels are finished on BRP's own automatic grinding machine, built in 2014 and upgraded since.": "BRP는 2009년 텅스텐 카바이드 커팅 휠 개발을 시작해 2010년부터 안양 공장에서 생산하고 있습니다. 휠은 2014년 자체 제작한 뒤 꾸준히 개선해 온 자동 연삭기로 마무리합니다."
 };
