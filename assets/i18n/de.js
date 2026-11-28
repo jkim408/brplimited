@@ -358,5 +358,20 @@ window.BRP_I18N.de = {
  "Black plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 145°.": "Schwarzer Kunststoffclip mit N2-Schneidrad, φ5.6 × 1.08 × 1.42 mm, 145°.",
  "Red plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 155°.": "Roter Kunststoffclip mit N2-Schneidrad, φ5.6 × 1.08 × 1.42 mm, 155°.",
  "Developed and ground in-house": "Selbst entwickelt, selbst geschliffen",
- "BRP began developing tungsten carbide cutting wheels in 2009 and has made them at its Anyang factory since 2010. The wheels are finished on BRP's own automatic grinding machine, built in 2014 and upgraded since.": "BRP begann 2009 mit der Entwicklung von Schneidrädern aus Wolframkarbid und fertigt sie seit 2010 im Werk Anyang. Die Räder werden auf BRPs eigener automatischer Schleifmaschine fertiggestellt, die 2014 gebaut und seitdem weiterentwickelt wurde."
+ "BRP began developing tungsten carbide cutting wheels in 2009 and has made them at its Anyang factory since 2010. The wheels are finished on BRP's own automatic grinding machine, built in 2014 and upgraded since.": "BRP begann 2009 mit der Entwicklung von Schneidrädern aus Wolframkarbid und fertigt sie seit 2010 im Werk Anyang. Die Räder werden auf BRPs eigener automatischer Schleifmaschine fertiggestellt, die 2014 gebaut und seitdem weiterentwickelt wurde.",
+ "BRP highlights": "BRP im Überblick",
+ "Wheel regrinding": "Rad-Nachschliff",
+ "Regrind used wheels": "Gebrauchte Räder",
+ "2–3 times.": "2–3-mal nachschleifen.",
+ "Back to original condition, at a lower price than new wheels.": "Zurück in den Originalzustand, günstiger als neue Räder.",
+ "How regrinding works": "So funktioniert der Nachschliff",
+ "Used wheel": "Gebrauchtes Rad",
+ "Reground": "Nachgeschliffen",
+ "Conversion pillar post": "Umrüst-Pillar-Post",
+ "From plastic to": "Von Kunststoff- zu",
+ "metal wheel holders.": "Metall-Radhaltern.",
+ "Replaces pillar posts for plastic wheel holders on heads with the same mounting diameter, and takes a BRP metal wheel holder with carbide axle. Longer life, improved cutting quality.": "Ersetzt Pillar Posts für Kunststoff-Radhalter an Köpfen mit gleichem Aufnahmedurchmesser und nimmt einen BRP-Metall-Radhalter mit Hartmetallachse auf. Längere Standzeit, bessere Schnittqualität.",
+ "See the pillar post": "Pillar Post ansehen",
+ "for plastic wheel holders": "für Kunststoff-Radhalter",
+ "with metal wheel holder": "mit Metall-Radhalter"
 };

@@ -358,5 +358,20 @@ window.BRP_I18N.ko = {
  "Black plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 145°.": "N2 커팅 휠(φ5.6 × 1.08 × 1.42 mm)이 장착된 검은색 플라스틱 클립, 145°.",
  "Red plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 155°.": "N2 커팅 휠(φ5.6 × 1.08 × 1.42 mm)이 장착된 빨간색 플라스틱 클립, 155°.",
  "Developed and ground in-house": "자체 개발, 자체 연삭",
- "BRP began developing tungsten carbide cutting wheels in 2009 and has made them at its Anyang factory since 2010. The wheels are finished on BRP's own automatic grinding machine, built in 2014 and upgraded since.": "BRP는 2009년 텅스텐 카바이드 커팅 휠 개발을 시작해 2010년부터 안양 공장에서 생산하고 있습니다. 휠은 2014년 자체 제작한 뒤 꾸준히 개선해 온 자동 연삭기로 마무리합니다."
+ "BRP began developing tungsten carbide cutting wheels in 2009 and has made them at its Anyang factory since 2010. The wheels are finished on BRP's own automatic grinding machine, built in 2014 and upgraded since.": "BRP는 2009년 텅스텐 카바이드 커팅 휠 개발을 시작해 2010년부터 안양 공장에서 생산하고 있습니다. 휠은 2014년 자체 제작한 뒤 꾸준히 개선해 온 자동 연삭기로 마무리합니다.",
+ "BRP highlights": "BRP 주요 서비스",
+ "Wheel regrinding": "휠 재연삭",
+ "Regrind used wheels": "사용한 휠을",
+ "2–3 times.": "2~3회까지 재연삭.",
+ "Back to original condition, at a lower price than new wheels.": "원래 상태로 되살려, 새 휠보다 낮은 가격에 공급합니다.",
+ "How regrinding works": "재연삭 서비스 보기",
+ "Used wheel": "사용한 휠",
+ "Reground": "재연삭 후",
+ "Conversion pillar post": "컨버전 필라포스트",
+ "From plastic to": "플라스틱 휠 홀더에서",
+ "metal wheel holders.": "메탈 휠 홀더로.",
+ "Replaces pillar posts for plastic wheel holders on heads with the same mounting diameter, and takes a BRP metal wheel holder with carbide axle. Longer life, improved cutting quality.": "같은 장착 지름의 헤드에서 플라스틱 휠 홀더용 필라포스트를 대체하고, 초경 액슬을 쓰는 BRP 메탈 휠 홀더를 장착합니다. 더 긴 수명, 향상된 절단 품질.",
+ "See the pillar post": "필라포스트 보기",
+ "for plastic wheel holders": "플라스틱 휠 홀더용",
+ "with metal wheel holder": "메탈 휠 홀더 장착"
 };

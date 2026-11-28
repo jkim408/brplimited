@@ -358,5 +358,20 @@ window.BRP_I18N.tr = {
  "Black plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 145°.": "N2 kesme tekerlekli (φ5.6 × 1.08 × 1.42 mm) Siyah plastik klips, 145°.",
  "Red plastic clip with N2 cutting wheel, φ5.6 × 1.08 × 1.42 mm, at 155°.": "N2 kesme tekerlekli (φ5.6 × 1.08 × 1.42 mm) Kırmızı plastik klips, 155°.",
  "Developed and ground in-house": "Kendi geliştirmemiz, kendi taşlamamız",
- "BRP began developing tungsten carbide cutting wheels in 2009 and has made them at its Anyang factory since 2010. The wheels are finished on BRP's own automatic grinding machine, built in 2014 and upgraded since.": "BRP, tungsten karbür kesme tekerleklerini 2009'da geliştirmeye başladı ve 2010'dan beri Anyang fabrikasında üretiyor. Tekerlekler, 2014'te yapılan ve o zamandan beri geliştirilen BRP'nin kendi otomatik taşlama makinesinde son işlemden geçirilir."
+ "BRP began developing tungsten carbide cutting wheels in 2009 and has made them at its Anyang factory since 2010. The wheels are finished on BRP's own automatic grinding machine, built in 2014 and upgraded since.": "BRP, tungsten karbür kesme tekerleklerini 2009'da geliştirmeye başladı ve 2010'dan beri Anyang fabrikasında üretiyor. Tekerlekler, 2014'te yapılan ve o zamandan beri geliştirilen BRP'nin kendi otomatik taşlama makinesinde son işlemden geçirilir.",
+ "BRP highlights": "BRP öne çıkanlar",
+ "Wheel regrinding": "Tekerlek yeniden bileme",
+ "Regrind used wheels": "Kullanılmış tekerlekleri",
+ "2–3 times.": "2–3 kez yeniden bileyin.",
+ "Back to original condition, at a lower price than new wheels.": "Orijinal haline, yeni tekerleklerden daha düşük bir fiyata.",
+ "How regrinding works": "Yeniden bileme nasıl işler",
+ "Used wheel": "Kullanılmış tekerlek",
+ "Reground": "Yeniden bilenmiş",
+ "Conversion pillar post": "Dönüşüm pillar post'u",
+ "From plastic to": "Plastikten",
+ "metal wheel holders.": "metal tekerlek tutuculara.",
+ "Replaces pillar posts for plastic wheel holders on heads with the same mounting diameter, and takes a BRP metal wheel holder with carbide axle. Longer life, improved cutting quality.": "Aynı montaj çapına sahip kafalarda plastik tekerlek tutucular için kullanılan pillar post'ların yerini alır ve karbür akslı BRP metal tekerlek tutucuyu taşır. Daha uzun ömür, daha iyi kesim kalitesi.",
+ "See the pillar post": "Pillar post'u inceleyin",
+ "for plastic wheel holders": "plastik tekerlek tutucular için",
+ "with metal wheel holder": "metal tekerlek tutuculu"
 };
